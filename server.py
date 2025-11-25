@@ -1,10 +1,10 @@
 from flask import Flask, Response, jsonify, send_from_directory
-from facialTracking import MotorController
+from facialTracking import FacialTracking
 import time
 
 
 app = Flask(__name__, static_folder = "static")
-controller = MotorController()
+controller = FacialTracking()
 
 @app.route("/")
 def index():
