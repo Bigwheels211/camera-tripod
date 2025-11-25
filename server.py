@@ -40,4 +40,4 @@ def video():
     return Response(generate(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5333, threaded=True)
+    app.run(host="0.0.0.0", port=5000, threaded=True)
