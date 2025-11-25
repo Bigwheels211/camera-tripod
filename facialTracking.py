@@ -34,7 +34,7 @@ def detect_center_point(vid, prev, numNotFound):
         return None
     cv2.circle(vid, center_point, closestFace[2]//2, (0,0,255),4) #Draw a circle around the face
     return center_point # return the center of the closest face to the previous
-class MotorController:
+class FacialTracking:
     def __init__(self):
         self.running = False
         self.thread = None
