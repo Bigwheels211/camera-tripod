@@ -1,34 +1,35 @@
-import gpiozero
+from gpiozero import Motor, Device
+#from gpiozero.pins.rpigpio import PiGPIOFactory
 import threading
 import time
-tiltMotorForwardPin = 0
-tiltMotorBackwardPin = 0
-tiltMotorActivatePin = 0
-rotationMotorForwardPin = 0
-rotationMotorBackwardPin = 0
-rotationMotorActivatePin = 0
+
+#Device.pin_factory = PiGPIOFactory()
+tiltMotorForwardPin = 12
+tiltMotorBackwardPin = 13
+rotationMotorForwardPin = 18
+rotationMotorBackwardPin = 19
 
 class motorController:
-    tiltMotor = Motor(tiltMotorForwardPin, tiltMotorBackwardPin, tiltMotorActivatePin)
-    rotationMotor = Motor(rotationMotorForwardPin, rotationMotorBackwardPin, rotationMotorActivatePin)
-    def moveX(xVector):
+    tiltMotor = Motor(tiltMotorForwardPin, tiltMotorBackwardPin, pwm=False)
+    rotationMotor = Motor(rotationMotorForwardPin, rotationMotorBackwardPin, pwm=False)
+    def moveX(self, xVector):
         if (xVector < 0):
-            rotationMotor.reverse()
-            sleep(0.03)
-            rotationMotor.stop()
+            self.rotationMotor.reverse()
+            time.sleep(0.03)
+            self.rotationMotor.stop()
         if (xVector > 0):
-            rotationMotor.forward()
-            sleep(0.03)
-            rotationMotor.stop()
-    def moveY(yVector):
+            self.rotationMotor.forward()
+            time.sleep(0.03)
+            self.rotationMotor.stop()
+    def moveY(self,yVector):
         if (yVector < 0):
-            tiltMotor.reverse()
-            sleep(0.03)
-            tiltMotor.stop()
+            self.tiltMotor.reverse()
+            time.sleep(0.03)
+            self.tiltMotor.stop()
         if (yVector > 0):
-            tiltMotor.forward()
-            sleep(0.03)
-            tiltMotor.stop()
-    def move(xVector, yVector):
-        moveX(xVector)
-        moveY(yVector)
+            self.tiltMotor.forward()
+            time.sleep(0.03)
+            self.tiltMotor.stop()
+    def move(self, xVector, yVector):
+        self.moveX(xVector)
+        self.moveY(yVector)
