@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+set -e  # Exit on error
+
+echo "=== Raspberry Pi Project Setup ==="
+
+#-------------------------------
+# 1. Load apt packages file
+#-------------------------------
+APT_FILE="apt-packages.txt"
+
+if [[ ! -f "$APT_FILE" ]]; then
+    echo "ERROR: $APT_FILE not found!"
+    exit 1
+fi
+
+echo "Installing APT packages from $APT_FILE..."
+sudo apt update
+sudo xargs -a "$APT_FILE" apt install -y
+
+echo "APT packages installed."
+
+#-------------------------------
+# 2. Create the virtual environment
+#-------------------------------
+if [[ ! -d ".venv" ]]; then
+    echo "Creating Python virtual environment..."
+    python3 -m venv .venv
+else
+    echo "Virtual environment already exists — skipping creation."
+fi
+
+echo "Activating virtual environment..."
+source .venv/bin/activate
+
+#-------------------------------
+# 3. Install Python requirements
+#-------------------------------
+REQ_FILE="requirements.txt"
+
+if [[ -f "$REQ_FILE" ]]; then
+    echo "Installing Python dependencies from requirements.txt..."
+    pip install --upgrade pip
+    pip install -r "$REQ_FILE"
+else
+    echo "WARNING: requirements.txt not found — skipping pip install."
+fi
+
+#-------------------------------
+# 4. Ensure pigpiod is enabled and running
+#-------------------------------
+echo "Enabling pigpiod..."
+sudo systemctl enable pigpiod
+sudo systemctl start pigpiod
+
+echo "Checking pigpiod status..."
+if pgrep pigpiod >/dev/null; then
+    echo "pigpiod is running."
+else
+    echo "ERROR: pigpiod failed to start!"
+    exit 1
+fi
+
+#-------------------------------
+# 5. Test Picamera2 import
+#-------------------------------
+echo "Testing Picamera2..."
+python3 - << 'EOF'
+try:
+    from picamera2 import Picamera2
+    print("Picamera2 import successful.")
+except Exception as e:
+    print("Picamera2 import FAILED:")
+    print(e)
+    exit(1)
+EOF
+
+#-------------------------------
+# 6. Test pigpio import
+#-------------------------------
+echo "Testing pigpio..."
+python3 - << 'EOF'
+try:
+    import pigpio
+    print("pigpio import successful.")
+except Exception as e:
+    print("pigpio import FAILED:")
+    print(e)
+    exit(1)
+EOF
+
+echo ""
+echo "=== Setup Complete! ==="
+echo "To start working, activate your venv with:"
+echo "source .venv/bin/activate"
