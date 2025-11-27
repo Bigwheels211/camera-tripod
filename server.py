@@ -47,7 +47,9 @@ def video():
 def takePic():
     camera.saveJPEG()
     return send_file("static/bufferimage.jpeg", mimetype='image/jpeg')
-
+@app.route("/previewimg")
+def previewimg():
+    return send_file("static/bufferimage.jpeg", mimetype='image/jpeg')
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=camera.getPort(), threaded=True)
