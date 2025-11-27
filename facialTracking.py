@@ -1,8 +1,9 @@
 import numpy as np
 import cv2
-import gpiozero
 import threading
-
+from motorControl import motorController
+import camera
+import time
 def findCenter(face):
     return (face[0] + face[2]//2, face[1] + face[3]//2)
 face_classifier = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml") # Initiallized the face_classifier with the haarcascades model
@@ -39,6 +40,8 @@ class FacialTracking:
         self.thread = None
         self.frame = None
         self.lock = threading.Lock()
+        self.controller = motorController()
+        
     def start(self):
         if not self.running:
             self.running = True
@@ -50,17 +53,13 @@ class FacialTracking:
             self.thread.join()
         self.thread = None
     def run(self):
-
-        video_capture = cv2.VideoCapture(0) 
-        result, video_frame = video_capture.read()
+        video_frame = camera.getPixelArray()
         prev_center = None # Initializes the prev_center variable, which will be used to tell the distance from faces in the current frame to the face from the previous frame
         counter = 0 # Initializes the counter variable, which will be used to tell how many frames in a row there has been since the face has been found
-        if result is True:
-            image_height, image_width = video_frame.shape[:2] # Get the width and height of the total image
-            window_center = (image_width//2, image_height//2) # Find the center of the camera
+        window_center = camera.getCenterPoint()
         while self.running:
-            result, video_frame = video_capture.read() # Read the current frame and set it as video_frame
-            if result is False: # If no frame is read, break
+            video_frame = camera.getPixelArray() # Read the current frame and set it as video_frame
+            if video_frame is None: # If no frame is read, break
                 break
             face_center = detect_center_point(video_frame, prev_center, counter) #Find the center point of the face that is closest to the previous
             if face_center is None: # If no face is found, index the counter variable, write no face found, and set the currrent face equal to the face in the last frame
@@ -75,11 +74,12 @@ class FacialTracking:
                 yVector = window_center[1] - face_center[1]
                 total_vector = str(xVector) + ', ' + str(yVector)
                 cv2.putText(video_frame,total_vector,face_center,cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,255),2,cv2.LINE_AA)
+                #self.controller.move(xVector,yVector)
             with self.lock:
                 self.frame = video_frame.copy()
+            
         else:
             print("Cannot Read Video")
-        video_capture.release()
     def get_frame_jpeg(self):
         with self.lock:
             if self.frame is None:

@@ -1,9 +1,11 @@
-from flask import Flask, Response, jsonify, send_from_directory
+from flask import Flask, Response, jsonify, send_from_directory, send_file
 from facialTracking import FacialTracking
 import time
-
+import camera
+import os
 
 app = Flask(__name__, static_folder = "static")
+app.config['DOWNLOAD_FOLDER'] = '__pycache__'
 controller = FacialTracking()
 
 @app.route("/")
@@ -29,7 +31,10 @@ def status():
 def video():
     def generate():
         while True:
-            frame = controller.get_frame_jpeg()
+            if controller.running:
+                frame = controller.get_frame_jpeg()
+            else:
+                frame = camera.getJPEG()
             if frame:
                 yield (b"--frame\r\n"
                        b"Content-Type: image/jpeg\r\n\r\n" +
@@ -38,6 +43,11 @@ def video():
             time.sleep(0.03)
 
     return Response(generate(), mimetype="multipart/x-mixed-replace; boundary=frame")
+@app.route("/takePic")
+def takePic():
+    camera.saveJPEG()
+    return send_file("static/bufferimage.jpeg", mimetype='image/jpeg')
+
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, threaded=True)
+    app.run(host="0.0.0.0", port=camera.getPort(), threaded=True)

@@ -1,0 +1,8 @@
+settings:
+  port: 5000 # the port that the controller will be viewable on
+  camera_type: picamera2 # the camera type that you are using (picamera2/usb)
+pins: #If you would like to use pwm(the better way), and on using a Pi 4, these are the only pins you can use for hardware pwm
+  rotationMotorForward: 13
+  rotationMotorReverse: 19
+  tiltMotorForward: 12
+  tiltMotorReverse: 18

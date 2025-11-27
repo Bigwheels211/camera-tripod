@@ -2,16 +2,16 @@ from gpiozero import Motor, Device
 from gpiozero.pins.pigpio import PiGPIOFactory
 import threading
 import time
+import yaml
 
+with open('config.yaml', 'r') as file:
+    config = yaml.safe_load(file)
+pins = config['pins']
 Device.pin_factory = PiGPIOFactory()
-tiltMotorForwardPin = 12
-tiltMotorBackwardPin = 13
-rotationMotorForwardPin = 18
-rotationMotorBackwardPin = 19
 
 class motorController:
-    tiltMotor = Motor(tiltMotorForwardPin, tiltMotorBackwardPin)
-    rotationMotor = Motor(rotationMotorForwardPin, rotationMotorBackwardPin)
+    tiltMotor = Motor(pins['tiltMotorForward'], pins['tiltMotorReverse'])
+    rotationMotor = Motor(pins['rotationMotorForward'], pins['rotationMotorReverse'])
     def moveX(self, xVector):
         if (xVector < 0):
             self.rotationMotor.reverse()
