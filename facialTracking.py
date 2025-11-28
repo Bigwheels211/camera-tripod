@@ -4,20 +4,27 @@ import threading
 from motorControl import motorController
 import camera
 import time
+import stopwatch
+
 def findCenter(face):
     return (face[0] + face[2]//2, face[1] + face[3]//2)
 face_classifier = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml") # Initiallized the face_classifier with the haarcascades model
 
 def detect_center_point(vid, prev, numNotFound):
     gray_image = cv2.cvtColor(vid, cv2.COLOR_BGR2GRAY) # converts the image to grayscale
-    faces = face_classifier.detectMultiScale(gray_image, 1.1, 5, minSize=(100, 100)) # Locates the faces and returns them in the format[x,y,w,h]
-    
+    scaleFactor = 0.5 # Scale factor for the image to be scaled down for faster processing
+    scaled_width = int(gray_image.shape[1] * scaleFactor) # Scales the image down to half size for faster processing
+    scaled_height = int(gray_image.shape[0] * scaleFactor)
+    small_gray_image = cv2.resize(gray_image, (scaled_width, scaled_height)) # Resizes the image to the new scaled size
+    faces = face_classifier.detectMultiScale(small_gray_image, 1.1, 5, minSize=(100, 100)) # Locates the faces and returns them in the format[x,y,w,h]
     if faces is None: # If there is no faces found, return None
         return  None
     closestFace = (0,0,0,0)
     closestDistance = 10000
     currentFace = 0
+    multiplier = int(1/scaleFactor) # Multiplier to get the face coordinates back to the original size
     for (x, y, w, h) in faces: # Loops through every face
+        faces[currentFace] = (x*multiplier, y*multiplier, w*multiplier, h*multiplier) # Scales the face coordinates back to the original size
         center_point = (x+w//2, y+h//2) # Finds the center point of every face
         if prev is None: # If there is no previous face, just return the first face that is found
             return center_point
@@ -53,11 +60,13 @@ class FacialTracking:
             self.thread.join()
         self.thread = None
     def run(self):
+        watch = stopwatch.Stopwatch()
         video_frame = camera.getPixelArray()
         prev_center = None # Initializes the prev_center variable, which will be used to tell the distance from faces in the current frame to the face from the previous frame
         counter = 0 # Initializes the counter variable, which will be used to tell how many frames in a row there has been since the face has been found
         window_center = camera.getCenterPoint()
         while self.running:
+            watch.start()
             video_frame = camera.getPixelArray() # Read the current frame and set it as video_frame
             if video_frame is None: # If no frame is read, break
                 break
@@ -77,7 +86,8 @@ class FacialTracking:
                 #self.controller.move(xVector,yVector)
             with self.lock:
                 self.frame = video_frame.copy()
-            
+            watch.get_elapsed_time()
+            watch.reset()
         else:
             print("Cannot Read Video")
     def get_frame_jpeg(self):
