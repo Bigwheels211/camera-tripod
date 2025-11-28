@@ -9,7 +9,11 @@ cameraType = settings['camera_type']
 if cameraType == 'picamera2':
     from picamera2 import Picamera2
     picam2 = Picamera2()
-    picamera2config = picam2.create_video_configuration({'format': 'RGB888'})
+    picamera2config = picam2.create_video_configuration( 
+                                                        main={"size": (1920, 1080),
+                                                              'format': 'RGB888'},
+                                                        sensor={
+                                                            'output_size': (1920, 1080)})
     picam2.configure(picamera2config)
     print('picamera2 started!')
     picam2.start()
