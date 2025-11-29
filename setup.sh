@@ -46,8 +46,14 @@ else
 fi
 
 #-------------------------------
-# 4. Ensure pigpiod is enabled and running
+# 4. Install and check pigpiod
 #-------------------------------
+wget https://github.com/joan2937/pigpio/archive/master.zip
+unzip master.zip
+cd pigpio-master
+make
+sudo make install
+
 echo "Enabling pigpiod..."
 sudo systemctl enable pigpiod
 sudo systemctl start pigpiod
