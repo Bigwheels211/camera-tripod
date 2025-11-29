@@ -87,6 +87,57 @@ except Exception as e:
     print(e)
     exit(1)
 EOF
+# --- 7. Setup systemd service for Flask ---
+sudo tee /etc/systemd/system/flaskapp.service > /dev/null <<EOF
+[Unit]
+Description=Flask Facial Tracker Server
+After=network.target
+
+[Service]
+User=$(whoami)
+WorkingDirectory=/home/$(whoami)/camera-tripod
+ExecStart=/home/$(whoami)/camera-tripod/.venv/bin/python server.py
+Restart=always
+Environment="PYTHONUNBUFFERED=1"
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable flaskapp
+sudo systemctl start flaskapp
+
+# --- 8. Setup Openbox autostart for kiosk mode ---
+mkdir -p ~/.config/openbox
+tee ~/.config/openbox/autostart > /dev/null <<'EOF'
+# Hide mouse after 0 seconds (always visible)
+# To hide mouse automatically, change -idle value
+unclutter -idle 1 &
+
+# Disable screen blanking
+xset -dpms
+xset s off
+xset s noblank
+
+# Wait for Flask server to start
+sleep 5
+
+# Launch Chromium in kiosk mode with cursor visible
+chromium \
+    --noerrdialogs \
+    --disable-infobars \
+    --kiosk http://localhost:5000 \
+    --incognito \
+    --disable-gpu \
+    --disable-software-rasterizer \
+    --overscroll-history-navigation=0 &
+EOF
+
+# --- 9. Auto-start X on login ---
+# Add to ~/.bash_profile if not already present
+grep -qxF 'if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then startx -- -nocursor; fi' ~/.bash_profile || \
+echo 'if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then startx -- -nocursor; fi' >> ~/.bash_profile
 
 echo ""
 echo "=== Setup Complete! ==="

@@ -25,6 +25,8 @@ class Stopwatch:
     def get_elapsed_time(self):
         if self.running:
             current_time = time.perf_counter()
-            print(current_time - self.start_time)
+            self.elapsed_time += current_time - self.start_time
+            ms_elapsed = self.elapsed_time * 1000
+            #print(str(ms_elapsed) + ' ms')
             return self.elapsed_time + (current_time - self.start_time)
         return self.elapsed_time

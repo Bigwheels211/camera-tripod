@@ -5,16 +5,17 @@
 
 <button onclick="fetch('/startFacial')">Start Program</button>
 <button onclick="fetch('/stop')">Stop Program</button>
-<button onclick="fetch('/takePic')">Take Picture</button>
+<button id = "takePic">Take Picture</button>
 
 <h3>Camera Feed</h3>
 <img src="/video" width="640" style="border:1px solid black;">
 
 <h3>Preview Image</h3>
-<img src="/previewimg" width="640" style="border:1px solid black;">
+<img id = "previmg" src="/previewimg" width="640" style="border:1px solid black;">
 
 <a href="/downloadimg" download>
     <button>Download Image</button>
 </a>
 </body>
 </html>
+<script src="/static/main.js"></script>

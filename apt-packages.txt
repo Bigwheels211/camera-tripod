@@ -4,8 +4,16 @@ python3-gpiozero
 python3-libgpiod
 python3-picamera2
 python3-pigpio
+python3-pyxdg
 python3-rpi-lgpio
 python3-smbus2
 python3-spidev
 python3-venv
 rpicam-apps
+xserver-xorg
+x11-xserver-utils
+xinit
+openbox
+chromium-browser
+unclutter
+git

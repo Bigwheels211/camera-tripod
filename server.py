@@ -3,9 +3,10 @@ from facialTracking import FacialTracking
 import time
 import camera
 import os
+import stopwatch
 
 app = Flask(__name__, static_folder = "static")
-app.config['DOWNLOAD_FOLDER'] = '__pycache__'
+app.config['DOWNLOAD_FOLDER'] = 'static'
 controller = FacialTracking()
 
 @app.route("/")
