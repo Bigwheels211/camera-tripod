@@ -53,7 +53,18 @@ unzip master.zip
 cd pigpio-master
 make
 sudo make install
+sudo tee /etc/systemd/system/pigpiod.service > dev.null <<EOF
+[Unit]
+Description=Daemon required to control GPIO pins via pigpio
+After=network.target
 
+[Service]
+ExecStart=/usr/bin/pigpiod
+Type=forking
+
+[Install]
+WantedBy=multi-user.target
+EOF
 echo "Enabling pigpiod..."
 sudo systemctl enable pigpiod
 sudo systemctl start pigpiod
