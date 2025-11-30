@@ -59,7 +59,7 @@ Description=Daemon required to control GPIO pins via pigpio
 After=network.target
 
 [Service]
-ExecStart=(which pigpiod)
+ExecStart=/usr/local/bin/pigpiod
 Type=forking
 
 [Install]
