@@ -24,7 +24,7 @@ echo "APT packages installed."
 #-------------------------------
 if [[ ! -d ".venv" ]]; then
     echo "Creating Python virtual environment..."
-    python3 -m venv .venv
+    python3 -m venv .venv --system-site-packages
 else
     echo "Virtual environment already exists — skipping creation."
 fi
