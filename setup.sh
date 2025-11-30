@@ -65,6 +65,7 @@ Type=forking
 [Install]
 WantedBy=multi-user.target
 EOF
+sudo systemctl daemon-reload
 echo "Enabling pigpiod..."
 sudo systemctl enable pigpiod
 sudo systemctl start pigpiod
