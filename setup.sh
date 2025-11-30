@@ -81,7 +81,7 @@ fi
 #-------------------------------
 # 5. Test Picamera2 import
 #-------------------------------
-source .venv/bin/activate
+source /home/(whoami)/.venv/bin/activate
 echo "Testing Picamera2..."
 python3 - << 'EOF'
 try:
@@ -96,7 +96,7 @@ EOF
 #-------------------------------
 # 6. Test pigpio import
 #-------------------------------
-source .venv/bin/activate
+source /home/(whoami)/.venv/bin/activate
 echo "Testing pigpio..."
 python3 - << 'EOF'
 try:
