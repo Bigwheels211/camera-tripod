@@ -49,22 +49,18 @@ class motorController:
         self.calibrateRotation()
         self.calibrateTilt()
     def moveX(self, xVector):
-        if (xVector < 0):
-            self.rotationMotor.reverse()
-            time.sleep(0.03)
-            self.rotationMotor.stop()
-        if (xVector > 0):
+        if (xVector < -50):
             self.rotationMotor.forward()
-            time.sleep(0.03)
+        elif (xVector > 50):
+            self.rotationMotor.reverse()
+        else
             self.rotationMotor.stop()
     def moveY(self,yVector):
-        if (yVector < 0):
-            self.tiltMotor.reverse()
-            time.sleep(0.03)
-            self.tiltMotor.stop()
-        if (yVector > 0):
+        if (yVector < -50):
             self.tiltMotor.forward()
-            time.sleep(0.03)
+        elif (yVector > 50):
+            self.tiltMotor.reverse()
+        else
             self.tiltMotor.stop()
     def move(self, xVector, yVector):
         self.moveX(xVector)
