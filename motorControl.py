@@ -1,5 +1,6 @@
 from gpiozero import Motor, Device
 from gpiozero.pins.pigpio import PiGPIOFactory
+from adafruit_servokit import ServoKit
 import camera
 import numpy as np
 import cv2
@@ -11,14 +12,17 @@ with open('config.yaml', 'r') as file:
     config = yaml.safe_load(file)
 pins = config['pins']
 Device.pin_factory = PiGPIOFactory()
-
+kit = ServoKit(channels=16)
 class motorController:
-    tiltMotor = Motor(pins['tiltMotorForward'], pins['tiltMotorReverse'])
-    rotationMotor = Motor(pins['rotationMotorForward'], pins['rotationMotorReverse'])
+    
     def __init__(self):
+        self.rotationMotor = kit.continuous_servo[12]
+        self.tiltMotor = kit.continuous_servo[13]
         self.rotationCalibrationFactor = 0 # Seconds/pixel
         self.tiltCalibrationFactor = 0 # Seconds/pixel
-        self.calibrate()
+        print("Initializing motors...")
+        self.rotationMotor.throttle = 0.1
+        #self.calibrate()
     def calibrateRotation(self):
         img1 = camera.getPixelArray()
         img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
@@ -50,22 +54,25 @@ class motorController:
         self.calibrateTilt()
     def moveX(self, xVector):
         if (xVector < 0):
-            self.rotationMotor.reverse()
+            self.rotationMotor.throttle = 1.0
             time.sleep(0.03)
-            self.rotationMotor.stop()
+            self.rotationMotor.throttle = 0.1
         if (xVector > 0):
-            self.rotationMotor.forward()
+            self.rotationMotor.throttle = -1.0
             time.sleep(0.03)
-            self.rotationMotor.stop()
+            self.rotationMotor.throttle = 0.1
     def moveY(self,yVector):
         if (yVector < 0):
-            self.tiltMotor.reverse()
-            time.sleep(0.03)
-            self.tiltMotor.stop()
+            self.tiltMotor.throttle = -1.0
+            #time.sleep(0.03)
+            #self.tiltMotor.throttle = 0.1
         if (yVector > 0):
-            self.tiltMotor.forward()
-            time.sleep(0.03)
-            self.tiltMotor.stop()
+            self.tiltMotor.throttle = 1.0
+            #time.sleep(0.03)
+            #self.tiltMotor.throttle = 0.1
     def move(self, xVector, yVector):
         self.moveX(xVector)
         self.moveY(yVector)
+    def stop(self):
+        self.rotationMotor.throttle = 0.09
+        self.tiltMotor.throttle = 0.09

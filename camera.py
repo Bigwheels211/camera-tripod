@@ -6,7 +6,7 @@ with open('config.yaml', 'r') as file:
 
 settings = config['settings']
 cameraType = settings['camera_type']
-if cameraType == 'picamera2':
+if cameraType == 'picamera2' or cameraType == 'picamera3':
     from picamera2 import Picamera2
     picam2 = Picamera2()
     picamera2config = picam2.create_video_configuration( 
@@ -20,7 +20,7 @@ if cameraType == 'picamera2':
 elif cameraType == 'usb':
     usbCam = cv2.VideoCapture(0)
 def getPixelArray():
-    if cameraType == 'picamera2':
+    if cameraType == 'picamera2' or 'picamera3':
         return picam2.capture_array()
     elif cameraType == 'usb':
         isRead, frame = usbCam.read()

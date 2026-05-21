@@ -59,6 +59,7 @@ class FacialTracking:
         if self.thread:
             self.thread.join()
         self.thread = None
+        self.controller.stop()
     def run(self):
         watch = stopwatch.Stopwatch()
         video_frame = camera.getPixelArray()
@@ -83,7 +84,7 @@ class FacialTracking:
                 yVector = window_center[1] - face_center[1]
                 total_vector = str(xVector) + ', ' + str(yVector)
                 cv2.putText(video_frame,total_vector,face_center,cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,255),2,cv2.LINE_AA)
-                #self.controller.move(xVector,yVector)
+                self.controller.move(xVector,yVector)
             with self.lock:
                 self.frame = video_frame.copy()
             watch.get_elapsed_time()

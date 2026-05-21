@@ -18,3 +18,4 @@ openbox
 chromium
 unclutter
 git
+i2c-tools
