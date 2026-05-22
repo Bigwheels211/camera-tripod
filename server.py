@@ -1,7 +1,7 @@
 from flask import Flask, Response, jsonify, send_from_directory, send_file
 from facialTracking import FacialTracking
 import time
-import camera
+from camera import cam
 import os
 import stopwatch
 
@@ -32,21 +32,27 @@ def status():
 def video():
     def generate():
         while True:
+            watch = stopwatch.Stopwatch()
+            watch.start()
             if controller.running:
                 frame = controller.get_frame_jpeg()
             else:
-                frame = camera.getJPEG()
+                frame = cam.getJPEG()
             if frame:
                 yield (b"--frame\r\n"
                        b"Content-Type: image/jpeg\r\n\r\n" +
                        frame +
                        b"\r\n")
-            time.sleep(0.03)
+            current_time = watch.get_elapsed_time()
+            print(current_time, "ms")
+            if current_time < 30: # If the time it took to get the frame is less than 33 ms, sleep for the rest of the time to make the stream run at about 30 fps
+                time.sleep((30 - current_time)/1000) # Sleep for 30 ms minus the time it took to get the frame, which should make the stream run at about 30 fps
+            watch.reset()
 
     return Response(generate(), mimetype="multipart/x-mixed-replace; boundary=frame")
 @app.route("/takePic")
 def takePic():
-    camera.saveJPEG()
+    cam.saveJPEG()
     return send_file("static/bufferimage.jpeg", mimetype='image/jpeg')
 @app.route("/previewimg")
 def previewimg():
@@ -55,4 +61,4 @@ def previewimg():
 def downloadimg():
     return send_from_directory('static', 'bufferimage.jpeg', as_attachment=True)
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=camera.getPort(), threaded=True)
+    app.run(host="0.0.0.0", port=cam.getPort(), threaded=True)

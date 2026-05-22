@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 import threading
 from motorControl import motorController
-import camera
+from camera import cam
 import time
 import stopwatch
 
@@ -62,13 +62,12 @@ class FacialTracking:
         self.controller.stop()
     def run(self):
         watch = stopwatch.Stopwatch()
-        video_frame = camera.getPixelArray()
+        video_frame = cam.getPixelArray()
         prev_center = None # Initializes the prev_center variable, which will be used to tell the distance from faces in the current frame to the face from the previous frame
         counter = 0 # Initializes the counter variable, which will be used to tell how many frames in a row there has been since the face has been found
-        window_center = camera.getCenterPoint()
+        window_center = cam.getCenterPoint()
         while self.running:
-            watch.start()
-            video_frame = camera.getPixelArray() # Read the current frame and set it as video_frame
+            video_frame = cam.getPixelArray() # Read the current frame and set it as video_frame
             if video_frame is None: # If no frame is read, break
                 break
             face_center = detect_center_point(video_frame, prev_center, counter) #Find the center point of the face that is closest to the previous
@@ -87,8 +86,6 @@ class FacialTracking:
                 self.controller.move(xVector,yVector)
             with self.lock:
                 self.frame = video_frame.copy()
-            watch.get_elapsed_time()
-            watch.reset()
         else:
             print("Cannot Read Video")
     def get_frame_jpeg(self):

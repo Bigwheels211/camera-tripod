@@ -1,8 +1,12 @@
 settings:
   port: 5000 # the port that the controller will be viewable on
   camera_type: picamera3 # the camera type that you are using (picamera2/usb/picamera3)
-pins: #If you would like to use pwm(the better way), and on using a Pi 4, these are the only pins you can use for hardware pwm
-  rotationMotorForward: 13
-  rotationMotorReverse: 19
-  tiltMotorForward: 12
-  tiltMotorReverse: 18
+channels:
+  rotationMotor: 0
+  tiltMotor: 1
+inverted:
+  rotationMotor: false
+  tiltMotor: false
+holdValues: # the values that the servos will be set to when the controller is not moving(different for each servo, only necessary because I'm using bad servos that don't have pots) 
+  rotationMotor: 0.05
+  tiltMotor: 0
