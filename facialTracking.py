@@ -67,6 +67,8 @@ class FacialTracking:
         counter = 0 # Initializes the counter variable, which will be used to tell how many frames in a row there has been since the face has been found
         window_center = cam.getCenterPoint()
         while self.running:
+            watch.reset()
+            watch.start()
             video_frame = cam.getPixelArray() # Read the current frame and set it as video_frame
             if video_frame is None: # If no frame is read, break
                 break
@@ -84,6 +86,7 @@ class FacialTracking:
                 total_vector = str(xVector) + ', ' + str(yVector)
                 cv2.putText(video_frame,total_vector,face_center,cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,255),2,cv2.LINE_AA)
                 self.controller.move(xVector,yVector)
+            cv2.putText(video_frame,str(watch.get_elapsed_time()) + " ms",(100,100),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,255),2,cv2.LINE_AA)
             with self.lock:
                 self.frame = video_frame.copy()
         else:
@@ -92,5 +95,6 @@ class FacialTracking:
         with self.lock:
             if self.frame is None:
                 return None
-            ret, jpeg = cv2.imencode('.jpg', self.frame)
+            encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 40]
+            ret, jpeg = cv2.imencode('.jpg', self.frame, encode_param)
             return jpeg.tobytes()

@@ -8,5 +8,5 @@ inverted:
   rotationMotor: false
   tiltMotor: false
 holdValues: # the values that the servos will be set to when the controller is not moving(different for each servo, only necessary because I'm using bad servos that don't have pots) 
-  rotationMotor: 0.05
-  tiltMotor: 0
+  rotationMotor: 0.09
+  tiltMotor: 0.09
